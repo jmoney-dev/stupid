@@ -1,0 +1,180 @@
+@import "tailwindcss";
+
+:root {
+  --background: #ffee2e;
+  --foreground: #130b05;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #ffee2e;
+    --foreground: #130b05;
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: "Comic Sans MS", "Comic Sans", cursive;
+  margin: 0;
+}
+
+.rage-root {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  background:
+    radial-gradient(circle at 12% 15%, #ff5f00 0, #ff5f00 18%, transparent 19%),
+    radial-gradient(circle at 85% 80%, #ff0000 0, #ff0000 20%, transparent 21%),
+    repeating-linear-gradient(
+      -15deg,
+      #ffee2e 0,
+      #ffee2e 24px,
+      #ffe100 24px,
+      #ffe100 48px
+    );
+  position: relative;
+  overflow: hidden;
+  padding: 1rem;
+}
+
+.noise {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.12;
+  background-image: radial-gradient(#000 0.9px, transparent 0.9px);
+  background-size: 4px 4px;
+}
+
+.rage-card {
+  width: min(94vw, 720px);
+  background: #ffffff;
+  border: 8px dashed #111;
+  transform: rotate(-1.2deg);
+  text-align: center;
+  padding: clamp(1rem, 4vw, 2.5rem);
+  box-shadow: 16px 16px 0 #000;
+  position: relative;
+  z-index: 1;
+}
+
+.rage-title {
+  margin: 0;
+  text-transform: uppercase;
+  font-size: clamp(2rem, 6vw, 4rem);
+  line-height: 0.9;
+  color: #db0011;
+  text-shadow: 3px 3px 0 #111;
+}
+
+.rage-subtitle {
+  margin: 0.6rem 0 1rem;
+  font-size: clamp(1rem, 2.3vw, 1.4rem);
+  font-weight: 700;
+}
+
+.stats-wrap {
+  background: #080808;
+  color: #03ff47;
+  border: 4px solid #03ff47;
+  padding: 0.9rem;
+  margin: 0 auto 1.25rem;
+  max-width: 460px;
+}
+
+.main-stat {
+  margin: 0;
+  font-size: clamp(2.6rem, 11vw, 5.4rem);
+  line-height: 1;
+  letter-spacing: 1px;
+}
+
+.stat-label {
+  margin: 0.3rem 0 0;
+  font-size: clamp(0.8rem, 2.4vw, 1.2rem);
+  text-transform: uppercase;
+}
+
+.missed-stat {
+  margin: 0.4rem 0 0;
+  color: #ffd0d0;
+  font-size: clamp(0.8rem, 2.3vw, 1.1rem);
+}
+
+.big-bad-button {
+  width: 100%;
+  max-width: 580px;
+  border: 7px solid #000;
+  background: linear-gradient(180deg, #ff0000, #ad0000);
+  color: #fff;
+  text-transform: uppercase;
+  font-weight: 900;
+  cursor: pointer;
+  padding: clamp(1rem, 6vh, 2.25rem);
+  font-size: clamp(2rem, 9vw, 5rem);
+  line-height: 0.92;
+  box-shadow: 0 10px 0 #000;
+  transform-origin: center;
+  transition: transform 0.08s linear;
+  animation: wobble 0.4s infinite alternate;
+}
+
+.big-bad-button:hover {
+  transform: scale(1.04) rotate(-0.9deg);
+}
+
+.big-bad-button:active {
+  transform: scale(0.96) rotate(1deg);
+}
+
+.rage-taunt {
+  margin: 1rem 0 0.6rem;
+  font-size: clamp(1.1rem, 3.4vw, 1.8rem);
+  color: #2e00d0;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.tiny-reset {
+  border: 2px solid #000;
+  background: #f2f2f2;
+  color: #000;
+  padding: 0.4rem 0.75rem;
+  cursor: pointer;
+  text-transform: lowercase;
+  font-size: 0.8rem;
+}
+
+@keyframes wobble {
+  from {
+    transform: rotate(-0.55deg);
+  }
+  to {
+    transform: rotate(0.55deg);
+  }
+}
+
+@media (max-width: 520px) {
+  .rage-card {
+    box-shadow: 8px 8px 0 #000;
+    border-width: 6px;
+    transform: rotate(-0.4deg);
+  }
+
+  .big-bad-button {
+    border-width: 5px;
+    box-shadow: 0 6px 0 #000;
+  }
+}
