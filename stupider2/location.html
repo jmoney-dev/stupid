@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Location Map</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #b584e5 100%);
+            background-size: 400% 400%;
+            animation: bgShift 8s ease infinite;
+            position: relative;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        @keyframes bgShift {
+            0% {
+                background-position: 0% 50%;
+                filter: hue-rotate(0deg);
+            }
+            25% {
+                background-position: 100% 50%;
+                filter: hue-rotate(45deg);
+            }
+            50% {
+                background-position: 100% 100%;
+                filter: hue-rotate(90deg);
+            }
+            75% {
+                background-position: 0% 100%;
+                filter: hue-rotate(45deg);
+            }
+            100% {
+                background-position: 0% 50%;
+                filter: hue-rotate(0deg);
+            }
+        }
+
+        .header {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 20;
+            text-align: center;
+        }
+
+        .title {
+            color: white;
+            font-size: 32px;
+            font-weight: 700;
+            text-shadow: 2px 2px 0 #000;
+            margin-bottom: 10px;
+        }
+
+        .nav-btn {
+            display: inline-block;
+            padding: 12px 30px;
+            background-color: #ffea00;
+            color: #000;
+            border: 3px solid #000;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.5);
+        }
+
+        .nav-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 6px 6px 0 rgba(0, 0, 0, 0.6);
+        }
+
+        #map {
+            width: 700px;
+            height: 550px;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            background-color: #90EE90;
+            border: 4px solid #000;
+            margin-top: 80px;
+        }
+
+        .map-controls {
+            display: flex;
+            gap: 10px;
+            z-index: 15;
+        }
+
+        .map-control-btn {
+            padding: 12px 25px;
+            font-size: 16px;
+            background-color: #ffea00;
+            color: #000;
+            border: 3px solid #000;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.5);
+            font-weight: 600;
+        }
+
+        .map-control-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 6px 6px 0 rgba(0, 0, 0, 0.6);
+        }
+
+        .map-control-btn:active {
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1 class="title">LOCATION MAP</h1>
+        <a href="layout.html" class="nav-btn">← HOME</a>
+    </div>
+
+    <canvas id="map"></canvas>
+    <div class="map-controls">
+        <button class="map-control-btn" onclick="zoomIn()">🔍+ ZOOM IN</button>
+        <button class="map-control-btn" onclick="zoomOut()">🔍- ZOOM OUT</button>
+        <button class="map-control-btn" onclick="centerOnLocation()">📍 CENTER</button>
+    </div>
+
+    <script>
+        let canvas = null;
+        let ctx = null;
+        let userLocation = null;
+        let mapZoom = 1;
+        let panX = 0;
+        let panY = 0;
+
+        function initMap() {
+            canvas = document.getElementById('map');
+            ctx = canvas.getContext('2d');
+            canvas.width = 700;
+            canvas.height = 550;
+
+            // Get user's location
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        userLocation = {
+                            lat: position.coords.latitude,
+                            lng: position.coords.longitude
+                        };
+                        drawMap();
+                        
+                        // Allow mouse panning
+                        canvas.addEventListener('mousedown', startPan);
+                        canvas.addEventListener('mousemove', doPan);
+                        canvas.addEventListener('mouseup', endPan);
+                    },
+                    (error) => {
+                        console.log('Location access denied, using default');
+                        userLocation = { lat: 40.7128, lng: -74.0060 };
+                        drawMap();
+                    }
+                );
+            }
+        }
+
+        let isPanning = false;
+        let lastX = 0;
+        let lastY = 0;
+
+        function startPan(e) {
+            isPanning = true;
+            lastX = e.clientX;
+            lastY = e.clientY;
+        }
+
+        function doPan(e) {
+            if (!isPanning) return;
+            const deltaX = e.clientX - lastX;
+            const deltaY = e.clientY - lastY;
+            panX += deltaX;
+            panY += deltaY;
+            lastX = e.clientX;
+            lastY = e.clientY;
+            drawMap();
+        }
+
+        function endPan() {
+            isPanning = false;
+        }
+
+        function drawMap() {
+            if (!ctx || !userLocation) return;
+
+            // Clear canvas with green background
+            ctx.fillStyle = '#90EE90';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Draw roads
+            ctx.strokeStyle = '#FFC107';
+            ctx.lineWidth = 4 * mapZoom;
+            const roadSpacing = 120 * mapZoom;
+            
+            // Horizontal roads
+            for (let y = panY % roadSpacing; y < canvas.height; y += roadSpacing) {
+                ctx.beginPath();
+                ctx.moveTo(0, y);
+                ctx.lineTo(canvas.width, y);
+                ctx.stroke();
+                
+                // Road markers
+                ctx.strokeStyle = '#FFF';
+                ctx.lineWidth = 1.5 * mapZoom;
+                ctx.setLineDash([10, 5]);
+                ctx.beginPath();
+                ctx.moveTo(0, y + 2 * mapZoom);
+                ctx.lineTo(canvas.width, y + 2 * mapZoom);
+                ctx.stroke();
+                ctx.setLineDash([]);
+                ctx.strokeStyle = '#FFC107';
+                ctx.lineWidth = 4 * mapZoom;
+            }
+            
+            // Vertical roads
+            for (let x = panX % roadSpacing; x < canvas.width; x += roadSpacing) {
+                ctx.beginPath();
+                ctx.moveTo(x, 0);
+                ctx.lineTo(x, canvas.height);
+                ctx.stroke();
+                
+                ctx.strokeStyle = '#FFF';
+                ctx.lineWidth = 1.5 * mapZoom;
+                ctx.setLineDash([10, 5]);
+                ctx.beginPath();
+                ctx.moveTo(x + 2 * mapZoom, 0);
+                ctx.lineTo(x + 2 * mapZoom, canvas.height);
+                ctx.stroke();
+                ctx.setLineDash([]);
+                ctx.strokeStyle = '#FFC107';
+                ctx.lineWidth = 4 * mapZoom;
+            }
+
+            // Draw buildings
+            const buildingSpacing = 40 * mapZoom;
+            for (let roadX = panX % roadSpacing; roadX < canvas.width; roadX += roadSpacing) {
+                for (let y = panY % buildingSpacing; y < canvas.height; y += buildingSpacing) {
+                    const buildingWidth = 25 * mapZoom;
+                    const buildingHeight = 30 * mapZoom;
+                    
+                    const colorIndex = (Math.floor((roadX + y) / 50)) % 5;
+                    const colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#F7DC6F', '#BB8FCE'];
+                    ctx.fillStyle = colors[colorIndex];
+                    ctx.fillRect(roadX + 20 * mapZoom, y, buildingWidth, buildingHeight);
+                    
+                    ctx.strokeStyle = '#333';
+                    ctx.lineWidth = 1.5 * mapZoom;
+                    ctx.strokeRect(roadX + 20 * mapZoom, y, buildingWidth, buildingHeight);
+                    
+                    // Windows
+                    ctx.fillStyle = '#FFE66D';
+                    for (let wx = 0; wx < 3; wx++) {
+                        for (let wy = 0; wy < 4; wy++) {
+                            const windowSize = 4 * mapZoom;
+                            ctx.fillRect(
+                                roadX + 22 * mapZoom + wx * 7 * mapZoom, 
+                                y + 2 * mapZoom + wy * 7 * mapZoom, 
+                                windowSize, 
+                                windowSize
+                            );
+                        }
+                    }
+                }
+                
+                // Buildings on left side
+                for (let y = panY % buildingSpacing; y < canvas.height; y += buildingSpacing) {
+                    const buildingWidth = 25 * mapZoom;
+                    const buildingHeight = 30 * mapZoom;
+                    
+                    const colorIndex = (Math.floor((roadX - y) / 50)) % 5;
+                    const colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#F7DC6F', '#BB8FCE'];
+                    ctx.fillStyle = colors[colorIndex];
+                    ctx.fillRect(roadX - 45 * mapZoom, y, buildingWidth, buildingHeight);
+                    
+                    ctx.strokeStyle = '#333';
+                    ctx.lineWidth = 1.5 * mapZoom;
+                    ctx.strokeRect(roadX - 45 * mapZoom, y, buildingWidth, buildingHeight);
+                    
+                    ctx.fillStyle = '#FFE66D';
+                    for (let wx = 0; wx < 3; wx++) {
+                        for (let wy = 0; wy < 4; wy++) {
+                            const windowSize = 4 * mapZoom;
+                            ctx.fillRect(
+                                roadX - 43 * mapZoom + wx * 7 * mapZoom, 
+                                y + 2 * mapZoom + wy * 7 * mapZoom, 
+                                windowSize, 
+                                windowSize
+                            );
+                        }
+                    }
+                }
+            }
+
+            // Draw user location marker
+            const centerX = canvas.width / 2 + panX;
+            const centerY = canvas.height / 2 + panY;
+            
+            // Marker glow
+            ctx.fillStyle = 'rgba(255, 107, 107, 0.2)';
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, 25 * mapZoom, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Main marker
+            ctx.fillStyle = '#ff6b6b';
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, 14 * mapZoom, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Inner dot
+            ctx.fillStyle = 'white';
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, 8 * mapZoom, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Draw info
+            ctx.fillStyle = '#333';
+            ctx.font = 'bold 14px Arial';
+            ctx.fillText(`Lat: ${userLocation.lat.toFixed(4)}`, 10, 25);
+            ctx.fillText(`Lng: ${userLocation.lng.toFixed(4)}`, 10, 45);
+            ctx.fillText(`Zoom: ${mapZoom.toFixed(1)}x`, 10, 65);
+        }
+
+        function zoomIn() {
+            mapZoom = Math.min(mapZoom + 0.2, 3);
+            if (canvas) drawMap();
+        }
+
+        function zoomOut() {
+            mapZoom = Math.max(mapZoom - 0.2, 0.5);
+            if (canvas) drawMap();
+        }
+
+        function centerOnLocation() {
+            panX = 0;
+            panY = 0;
+            mapZoom = 1;
+            if (canvas) drawMap();
+        }
+
+        // Initialize on load
+        window.addEventListener('load', initMap);
+    </script>
+</body>
+</html>
