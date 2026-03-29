@@ -13,18 +13,30 @@
         }
 
         body {
-            font-family: Arial, Helvetica, sans-serif;
-            display: flex;
-            justify-content: flex-start;
-            align-items: flex-start;
+            font-family: "Comic Sans MS", "Papyrus", cursive;
+            display: block;
             min-height: 100vh;
-            background: linear-gradient(135deg, #9c9c9c 0%, #6f6f6f 100%);
+            background: linear-gradient(17deg, #00ff99 0%, #ff006a 34%, #f7ff00 68%, #009dff 100%);
             background-size: 400% 400%;
             animation: stupidBgShift 8s ease infinite, stupidBounce 4s ease-in-out infinite;
             position: relative;
+            overflow-x: hidden;
+            overflow-y: auto;
+            letter-spacing: 0.6px;
+            cursor: crosshair;
+        }
+
+        body.menu-open {
+            font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+            background: #f3f6fb;
+            animation: none;
+            cursor: default;
             overflow: hidden;
-            flex-direction: column;
-            gap: 40px;
+            letter-spacing: 0;
+        }
+
+        body.menu-open::before {
+            display: none;
         }
 
         body.shake {
@@ -97,45 +109,78 @@
         .count-display {
             font-size: clamp(170px, 28vw, 390px);
             font-weight: bold;
-            color: #ffea00;
+            color: #ffffff;
             line-height: 1;
             font-variant-numeric: tabular-nums;
-            text-shadow: 4px 4px 0 #000;
+            text-shadow: 0 8px 22px rgba(0, 0, 0, 0.45);
             background: transparent;
             border: 0;
             padding: 0;
-            margin-left: 78px;
-            margin-top: -10px;
-            transform: rotate(-2deg);
+            margin-left: 0;
+            margin-top: 0;
+            transform: rotate(-1deg);
+            display: block;
+            position: fixed;
+            right: 28px;
+            top: 49%;
+            transform: translateY(-10%) rotate(-1deg);
+            z-index: 140;
+            pointer-events: none;
+            text-align: right;
+        }
+
+        .badum-hud {
+            position: fixed;
+            top: 8px;
+            left: 50%;
+            transform: translateX(-50%) rotate(-2deg);
+            z-index: 120;
+            font-size: clamp(20px, 4vw, 42px);
+            font-weight: 900;
+            color: #00ff7b;
+            text-shadow: 3px 3px 0 #000;
+            pointer-events: none;
+            white-space: nowrap;
         }
 
         .counter-label {
             color: #ffffff;
-            font-size: 28px;
-            font-weight: 700;
-            letter-spacing: 1px;
+            font-size: 24px;
+            font-weight: 600;
+            letter-spacing: 2px;
             text-transform: uppercase;
-            text-shadow: 2px 2px 0 #000;
-            background: #ff3d00;
-            border: 3px solid #000;
-            padding: 8px 12px;
-            margin-left: 18px;
-            transform: rotate(1deg);
+            text-shadow: 0 4px 10px rgba(0, 0, 0, 0.45);
+            background: rgba(15, 23, 42, 0.76);
+            border: 1px solid rgba(148, 163, 184, 0.5);
+            padding: 8px 14px;
+            margin-left: 0;
+            margin-top: 0;
+            transform: rotate(0deg);
+            width: fit-content;
+            position: fixed;
+            right: 34px;
+            top: 35%;
+            z-index: 141;
+            pointer-events: none;
+            border-radius: 12px;
+            backdrop-filter: blur(6px);
         }
 
         .step-unit {
-            color: #111;
-            font-size: 52px;
+            color: #ffffff;
+            font-size: 63px;
             font-weight: 600;
             letter-spacing: 0.5px;
             text-transform: uppercase;
-            margin-top: -58px;
-            margin-left: 320px;
+            margin-top: -20px;
+            margin-left: 280px;
             background: transparent;
             border: 0;
             padding: 0;
-            transform: rotate(-4deg);
-            text-shadow: 2px 2px 0 #fff;
+            transform: rotate(14deg);
+            text-shadow: 3px 3px 0 #111;
+            position: relative;
+            z-index: 9;
         }
 
         .step-cluster {
@@ -144,7 +189,7 @@
             flex-direction: column;
             align-items: center;
             gap: 8px;
-            z-index: 3;
+            z-index: 30;
             width: 220px;
             height: 260px;
         }
@@ -153,17 +198,81 @@
             position: relative;
             width: 200px;
             height: 200px;
-            border-radius: 50%;
+            border-radius: 15% 60% 10% 70%;
             font-size: 58px;
-            background-color: #18a600;
-            color: white;
-            border: 6px solid #000;
+            background-color: #ff00f2;
+            color: #ffee00;
+            border: 8px double #000;
             cursor: pointer;
-            box-shadow: 12px 12px 0 rgba(0, 0, 0, 0.6);
+            box-shadow: -15px 11px 0 rgba(0, 0, 0, 0.6);
             font-weight: bold;
             transition: all 0.2s ease;
-            letter-spacing: 2px;
-            z-index: 3;
+            letter-spacing: 8px;
+            z-index: 31;
+            transform: rotate(-13deg);
+        }
+
+        .menu-screen {
+            position: fixed;
+            inset: 0;
+            z-index: 999;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 14px;
+            background:
+                radial-gradient(circle at 15% 20%, rgba(14, 165, 233, 0.28), transparent 40%),
+                radial-gradient(circle at 85% 80%, rgba(56, 189, 248, 0.2), transparent 36%),
+                linear-gradient(135deg, #f8fafc 0%, #eef2ff 100%);
+            font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+            text-align: center;
+            padding: 18px;
+        }
+
+        .menu-screen.hidden {
+            display: none;
+        }
+
+        .menu-title {
+            font-size: clamp(36px, 6vw, 64px);
+            color: #0f172a;
+            font-weight: 700;
+            letter-spacing: -0.03em;
+            text-shadow: none;
+            transform: none;
+        }
+
+        .menu-sub {
+            font-size: 18px;
+            color: #334155;
+            background: rgba(255, 255, 255, 0.92);
+            border: 1px solid rgba(148, 163, 184, 0.45);
+            border-radius: 16px;
+            padding: 16px 18px;
+            max-width: 720px;
+            box-shadow: 0 12px 40px rgba(15, 23, 42, 0.09);
+        }
+
+        .menu-start-btn {
+            padding: 14px 24px;
+            font-size: 18px;
+            font-weight: 700;
+            letter-spacing: 0.02em;
+            color: #fff;
+            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+            border: 1px solid rgba(29, 78, 216, 0.8);
+            cursor: pointer;
+            transform: none;
+            border-radius: 999px;
+            box-shadow: 0 8px 30px rgba(37, 99, 235, 0.3);
+            transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+        }
+
+        .menu-start-btn:hover {
+            transform: translateY(-2px);
+            background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%);
+            box-shadow: 0 12px 34px rgba(37, 99, 235, 0.4);
         }
 
         .plus-btn:hover {
@@ -222,31 +331,32 @@
 
         .spin-gif {
             position: fixed;
-            left: 24px;
-            top: 18px;
-            width: 180px;
-            height: 180px;
+            left: 58vw;
+            top: 7px;
+            width: 220px;
+            height: 150px;
             object-fit: cover;
             border: 4px solid #000;
-            border-radius: 50%;
+            border-radius: 2px;
             z-index: 2;
             opacity: 0.88;
-            animation: spin360 2.4s linear infinite;
+            animation: spin360 1.2s linear infinite;
             pointer-events: none;
         }
 
         .reels-panel {
             position: fixed;
-            right: 12px;
-            top: 12px;
-            width: 190px;
-            height: 88vh;
-            border: 4px solid #000;
-            background: rgba(0, 0, 0, 0.7);
+            right: -10px;
+            top: 100px;
+            width: 270px;
+            height: 73vh;
+            border: 9px groove #000;
+            background: rgba(0, 0, 0, 0.55);
             color: #fff;
             z-index: 4;
             display: flex;
             flex-direction: column;
+            transform: rotate(-9deg);
         }
 
         .reels-title {
@@ -435,18 +545,20 @@
         .map-control-btn {
             padding: 10px 20px;
             font-size: 14px;
-            background-color: #667eea;
+            background-color: #ff5e00;
             color: white;
-            border: none;
-            border-radius: 8px;
+            border: 2px solid #000;
+            border-radius: 0;
             cursor: pointer;
             transition: all 0.2s ease;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            transform: rotate(-2deg);
         }
 
         .map-control-btn:hover {
-            background-color: #5568d3;
-            transform: translateY(-2px);
+            background-color: #ffd400;
+            color: #000;
+            transform: translateY(-2px) rotate(3deg) scale(1.04);
         }
 
         .map-control-btn:active {
@@ -455,16 +567,17 @@
 
         .location-panel {
             position: fixed;
-            left: 12px;
-            bottom: 12px;
+            left: 340px;
+            bottom: 40px;
             width: min(92vw, 420px);
             max-height: 45vh;
             overflow: auto;
             z-index: 11;
-            background: rgba(0, 0, 0, 0.78);
-            color: #fff;
-            border: 3px solid #fff;
+            background: rgba(255, 241, 117, 0.88);
+            color: #1d1d1d;
+            border: 7px ridge #00a1ff;
             padding: 12px;
+            transform: rotate(-4deg);
         }
 
         .location-panel h2 {
@@ -497,9 +610,129 @@
             font-size: 12px;
             color: #a7ff83;
         }
+
+        .heart-panel {
+            position: fixed;
+            left: 63px;
+            top: 280px;
+            width: min(92vw, 420px);
+            z-index: 11;
+            background: transparent;
+            color: #0a0a0a;
+            border: 0;
+            padding: 14px;
+            transform: rotate(5deg);
+        }
+
+        .subway-player {
+            position: fixed;
+            right: 14px;
+            bottom: 10px;
+            width: min(92vw, 340px);
+            z-index: 20;
+            transform: rotate(-3deg);
+        }
+
+        .subway-label {
+            font-size: 16px;
+            font-weight: 900;
+            color: #fff;
+            text-shadow: 2px 2px 0 #000;
+            margin-bottom: 4px;
+        }
+
+        .subway-frame {
+            width: 100%;
+            aspect-ratio: 16 / 9;
+            border: 0;
+            display: block;
+        }
+
+        .heart-title {
+            font-size: 30px;
+            margin-bottom: 8px;
+            text-decoration: underline wavy;
+        }
+
+        .heart-bpm {
+            font-size: 44px;
+            font-weight: 900;
+            color: #ff0088;
+            text-shadow: 2px 2px 0 #fff;
+            margin-bottom: 8px;
+        }
+
+        .heart-meta {
+            font-size: 14px;
+            color: #222;
+            margin-bottom: 10px;
+        }
+
+        .heart-status {
+            font-size: 12px;
+            color: #0011ff;
+            margin-top: 8px;
+        }
+
+        @media (max-width: 768px) {
+            .heart-panel {
+                top: auto;
+                left: 10px;
+                bottom: 14px;
+                max-height: 42vh;
+                overflow: auto;
+                transform: rotate(1deg);
+            }
+
+            .location-panel {
+                bottom: auto;
+                left: 10px;
+                top: 14px;
+                max-height: 42vh;
+                transform: rotate(-1deg);
+            }
+
+            .reels-panel {
+                top: auto;
+                bottom: 120px;
+                right: -40px;
+                height: 45vh;
+                transform: rotate(-6deg);
+            }
+
+            .spin-gif {
+                left: 48vw;
+                width: 150px;
+                height: 120px;
+            }
+
+            .counter-label {
+                right: 10px;
+                top: 34%;
+                font-size: 16px;
+            }
+
+            .count-display {
+                right: 10px;
+                top: 48%;
+                font-size: clamp(90px, 22vw, 180px);
+            }
+
+            .subway-player {
+                right: 8px;
+                bottom: 8px;
+                width: min(90vw, 270px);
+            }
+        }
     </style>
 </head>
-<body>
+<body class="menu-open">
+    <section class="menu-screen" id="menuScreen" aria-label="Main menu">
+        <h1 class="menu-title">PulseStep Analytics</h1>
+        <p class="menu-sub">A playful motion dashboard with voice-reactive pulse tracking, chaotic step interactions, and location distance measured in Pikachu heights.</p>
+        <button class="menu-start-btn" type="button" onclick="startExperience()">Launch Experience</button>
+    </section>
+
     <img
         class="spin-gif"
         src="https://media.giphy.com/media/l0HlQ7LRalQqdWfao/giphy.gif"
@@ -510,6 +743,7 @@
     <div class="flash" id="flash"></div>
     <div class="mlg-overlay" id="mlgOverlay"></div>
     <div class="footsteps-container" id="footsteps"></div>
+    <div class="badum-hud" id="badumHud">BADUM COUNT: 0</div>
     <aside class="reels-panel" aria-label="Reels sidebar">
         <div class="reels-title">Reels</div>
         <div class="reels-feed" id="reelsFeed"></div>
@@ -522,6 +756,20 @@
         <div class="step-outside">STEP</div>
     </div>
 
+    <section class="heart-panel" aria-label="Badum heart tracker panel">
+        <h2 class="heart-title">Badum Heart Tracker</h2>
+        <div class="heart-bpm" id="heartBpm">0 BPM</div>
+        <p class="heart-meta" id="heartMeta">Say "badum badum" into the mic to fake your pulse.</p>
+        <div class="location-actions">
+            <button class="map-control-btn" type="button" onclick="startBadumTracker()">Start Mic</button>
+            <button class="map-control-btn" type="button" onclick="stopBadumTracker()">Stop Mic</button>
+            <button class="map-control-btn" type="button" onclick="manualBadum()">Fake Badum</button>
+            <button class="map-control-btn" type="button" onclick="manualBadumPair()">Fake Badum x2</button>
+            <button class="map-control-btn" type="button" onclick="clearBadumData()">Clear</button>
+        </div>
+        <p class="heart-status" id="heartStatus">Tracker idle. Waiting for badum energy.</p>
+    </section>
+
     <section class="location-panel" aria-label="Location history panel">
         <h2>Location History</h2>
         <div class="location-actions">
@@ -532,10 +780,38 @@
         <ul class="location-list" id="locationList"></ul>
     </section>
 
+    <section class="subway-player" aria-label="Subway Surfers video">
+        <div class="subway-label">SUBWAY SURFERS SIDE QUEST</div>
+        <iframe
+            class="subway-frame"
+            src="https://www.youtube.com/embed/4f7x6S8Xh5Y?autoplay=1&mute=1&loop=1&playlist=4f7x6S8Xh5Y&controls=1"
+            title="Subway Surfers gameplay"
+            loading="lazy"
+            allow="autoplay; encrypted-media; picture-in-picture"
+            referrerpolicy="strict-origin-when-cross-origin"
+            allowfullscreen
+        ></iframe>
+    </section>
+
     <script>
         let count = 0;
         let audioCtx;
         let masterGain;
+        let speechRecognition;
+        let shouldKeepListening = false;
+        let isListening = false;
+        let micPermissionPrimed = false;
+        let micStream = null;
+        let micAnalyser = null;
+        let micSource = null;
+        let micData = null;
+        let micRafId = 0;
+        let lastMicPeakAt = 0;
+        let micNoiseFloor = 0.02;
+        let bpmTimerId = 0;
+        let totalBadums = 0;
+        const PIKACHU_HEIGHT_METERS = 0.4;
+        const badumBeatTimes = [];
         const locationHistory = [];
         const gifUrls = [
             'https://media.giphy.com/media/3o7aD2saalBwwftBIY/giphy.gif',
@@ -558,6 +834,292 @@
             'TACTICAL STEP',
             'DORITO MODE'
         ];
+
+        function startExperience() {
+            const menu = document.getElementById('menuScreen');
+            menu.classList.add('hidden');
+            document.body.classList.remove('menu-open');
+            document.getElementById('heartStatus').textContent = 'Menu cleared. Absolute nonsense is now active.';
+        }
+
+        function getSpeechRecognitionApi() {
+            return window.SpeechRecognition || window.webkitSpeechRecognition;
+        }
+
+        function estimateBpm() {
+            if (badumBeatTimes.length < 2) {
+                return 0;
+            }
+
+            const now = Date.now();
+            const active = badumBeatTimes.filter((time) => now - time <= 10000);
+            if (active.length < 2) {
+                return 0;
+            }
+
+            const spanMs = active[active.length - 1] - active[0];
+            if (spanMs <= 0) {
+                return 0;
+            }
+
+            const beatsPerMinute = ((active.length - 1) * 60000) / spanMs;
+
+            return Math.max(20, Math.min(260, Math.round(beatsPerMinute)));
+        }
+
+        function ensureBpmTimer() {
+            if (bpmTimerId) {
+                return;
+            }
+
+            bpmTimerId = window.setInterval(() => {
+                updateHeartDisplay();
+            }, 1000);
+        }
+
+        function updateHeartDisplay() {
+            const now = Date.now();
+            while (badumBeatTimes.length && now - badumBeatTimes[0] > 30000) {
+                badumBeatTimes.shift();
+            }
+
+            const bpm = estimateBpm();
+            const pairCount = Math.floor(totalBadums / 2);
+            document.getElementById('heartBpm').textContent = `${bpm} BPM`;
+            document.getElementById('heartMeta').textContent = `${totalBadums} badums heard, ${pairCount} dramatic heart thumps, updates every second.`;
+            document.getElementById('badumHud').textContent = `BADUM COUNT: ${totalBadums}`;
+        }
+
+        function registerBadums(amount, sourceLabel) {
+            if (!amount || amount < 1) {
+                return;
+            }
+
+            const now = Date.now();
+            const spacing = 430;
+
+            for (let i = 0; i < amount; i++) {
+                const offset = (amount - i - 1) * spacing;
+                badumBeatTimes.push(now - offset);
+            }
+
+            totalBadums += amount;
+            updateHeartDisplay();
+            document.getElementById('heartStatus').textContent = `Heard ${amount} badum from ${sourceLabel}.`; 
+        }
+
+        function startMicBeatLoop() {
+            if (!micAnalyser || !micData) {
+                return;
+            }
+
+            const detect = () => {
+                if (!isListening || !micAnalyser || !micData) {
+                    return;
+                }
+
+                micAnalyser.getByteTimeDomainData(micData);
+
+                let sumSquares = 0;
+                for (let i = 0; i < micData.length; i++) {
+                    const sample = (micData[i] - 128) / 128;
+                    sumSquares += sample * sample;
+                }
+
+                const rms = Math.sqrt(sumSquares / micData.length);
+                const now = Date.now();
+                micNoiseFloor = (micNoiseFloor * 0.96) + (rms * 0.04);
+                const dynamicThreshold = Math.max(0.045, micNoiseFloor * 2.2);
+
+                if (rms > dynamicThreshold && now - lastMicPeakAt > 280) {
+                    lastMicPeakAt = now;
+                    registerBadums(1, 'mic beat');
+                }
+
+                micRafId = requestAnimationFrame(detect);
+            };
+
+            if (micRafId) {
+                cancelAnimationFrame(micRafId);
+            }
+            micRafId = requestAnimationFrame(detect);
+        }
+
+        function stopMicBeatLoop() {
+            if (micRafId) {
+                cancelAnimationFrame(micRafId);
+                micRafId = 0;
+            }
+        }
+
+        async function getMicStream() {
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                document.getElementById('heartStatus').textContent = 'Mic API unsupported. Use Fake Badum buttons.';
+                return null;
+            }
+
+            const hasLiveTrack = micStream && micStream.getAudioTracks().some((track) => track.readyState === 'live');
+            if (hasLiveTrack) {
+                micStream.getAudioTracks().forEach((track) => {
+                    track.enabled = true;
+                });
+                return micStream;
+            }
+
+            try {
+                micStream = await navigator.mediaDevices.getUserMedia({
+                    audio: {
+                        echoCancellation: true,
+                        noiseSuppression: true,
+                        autoGainControl: true,
+                    }
+                });
+                micPermissionPrimed = true;
+                return micStream;
+            } catch (error) {
+                document.getElementById('heartStatus').textContent = `Mic permission denied: ${error.message}`;
+                return null;
+            }
+        }
+
+        function countBadumWords(text) {
+            const normalized = text.toLowerCase();
+            const matches = normalized.match(/ba\s*-?\s*d[au]m|bad[au]m|buh\s*d[au]m|da\s*bum/g);
+            return matches ? matches.length : 0;
+        }
+
+        function setupBadumRecognition() {
+            if (speechRecognition) {
+                return true;
+            }
+
+            const SpeechApi = getSpeechRecognitionApi();
+            if (!SpeechApi) {
+                document.getElementById('heartStatus').textContent = 'Speech recognition unsupported. Use Fake Badum button.';
+                return false;
+            }
+
+            speechRecognition = new SpeechApi();
+            speechRecognition.continuous = true;
+            speechRecognition.interimResults = true;
+            speechRecognition.lang = 'en-US';
+
+            speechRecognition.onresult = (event) => {
+                for (let i = event.resultIndex; i < event.results.length; i++) {
+                    if (!event.results[i].isFinal) {
+                        continue;
+                    }
+
+                    const transcript = event.results[i][0].transcript || '';
+                    const heardBadums = countBadumWords(transcript);
+                    document.getElementById('heartStatus').textContent = `Mic heard: "${transcript.trim()}"`; 
+                    if (heardBadums > 0) {
+                        registerBadums(heardBadums, 'mic');
+                    }
+                }
+            };
+
+            speechRecognition.onerror = (event) => {
+                isListening = false;
+                shouldKeepListening = false;
+                document.getElementById('heartStatus').textContent = `Mic error: ${event.error}.`; 
+            };
+
+            speechRecognition.onend = () => {
+                isListening = false;
+                if (shouldKeepListening) {
+                    document.getElementById('heartStatus').textContent = 'Mic paused by browser. Press Start Mic again.';
+                }
+            };
+
+            return true;
+        }
+
+        async function primeMicPermission() {
+            if (micPermissionPrimed) {
+                return true;
+            }
+
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                return false;
+            }
+
+            const stream = await getMicStream();
+            return Boolean(stream);
+        }
+
+        async function startBadumTracker() {
+            if (isListening) {
+                document.getElementById('heartStatus').textContent = 'Mic already listening.';
+                return;
+            }
+
+            const hasPermission = await primeMicPermission();
+            if (!hasPermission) {
+                document.getElementById('heartStatus').textContent = 'Cannot start mic. Use Fake Badum buttons if needed.';
+                return;
+            }
+
+            const stream = await getMicStream();
+            if (!stream) {
+                return;
+            }
+
+            initAudio();
+
+            if (!micAnalyser) {
+                micAnalyser = audioCtx.createAnalyser();
+                micAnalyser.fftSize = 1024;
+                micAnalyser.smoothingTimeConstant = 0.25;
+                micData = new Uint8Array(micAnalyser.fftSize);
+            }
+
+            if (micSource) {
+                try {
+                    micSource.disconnect();
+                } catch (error) {
+                    // Ignore disconnect errors if the node is already disconnected.
+                }
+            }
+
+            micSource = audioCtx.createMediaStreamSource(stream);
+            micSource.connect(micAnalyser);
+
+            shouldKeepListening = true;
+            isListening = true;
+            ensureBpmTimer();
+            startMicBeatLoop();
+            document.getElementById('heartStatus').textContent = 'Mic live. Say badum badum; loud syllables are counted as beats.';
+        }
+
+        function stopBadumTracker() {
+            shouldKeepListening = false;
+            isListening = false;
+            stopMicBeatLoop();
+
+            if (micStream) {
+                micStream.getAudioTracks().forEach((track) => {
+                    track.enabled = false;
+                });
+            }
+
+            document.getElementById('heartStatus').textContent = 'Mic stopped. Pulse pretending paused.';
+        }
+
+        function manualBadum() {
+            registerBadums(1, 'button');
+        }
+
+        function manualBadumPair() {
+            registerBadums(2, 'button combo');
+        }
+
+        function clearBadumData() {
+            badumBeatTimes.length = 0;
+            totalBadums = 0;
+            updateHeartDisplay();
+            document.getElementById('heartStatus').textContent = 'Cleared fake pulse history.';
+        }
 
         function moveAndIncrement() {
             count++;
@@ -810,6 +1372,11 @@
             return distance;
         }
 
+        function kmToPikachuHeights(km) {
+            const meters = km * 1000;
+            return meters / PIKACHU_HEIGHT_METERS;
+        }
+
         function renderLocationHistory() {
             const list = document.getElementById('locationList');
             list.innerHTML = '';
@@ -827,7 +1394,8 @@
                         entry.latitude, entry.longitude
                     );
                     totalDistance += distance;
-                    distanceText = ` | ${distance.toFixed(3)}km from prev`;
+                    const pikachuHeights = kmToPikachuHeights(distance);
+                    distanceText = ` | ${pikachuHeights.toFixed(1)} pikachu-heights from prev`;
                 }
                 
                 item.textContent = `#${index + 1} ${entry.latitude.toFixed(6)}, ${entry.longitude.toFixed(6)}${distanceText} (${entry.timestamp})`;
@@ -839,7 +1407,8 @@
                 totalItem.className = 'location-item';
                 totalItem.style.fontWeight = 'bold';
                 totalItem.style.backgroundColor = 'rgba(255, 255, 255, 0.15)';
-                totalItem.textContent = `Total distance traveled: ${totalDistance.toFixed(3)}km`;
+                const totalPikachuHeights = kmToPikachuHeights(totalDistance);
+                totalItem.textContent = `Total distance traveled: ${totalPikachuHeights.toFixed(1)} pikachu-heights`;
                 list.appendChild(totalItem);
             }
         }
@@ -849,6 +1418,7 @@
             moveButton();
             seedRandomGifs();
             initReels();
+            ensureBpmTimer();
         });
     </script>
 </body>
