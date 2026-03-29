@@ -24,16 +24,11 @@
             position: relative;
             overflow: hidden;
             flex-direction: column;
-<<<<<<< HEAD
-            gap: 10px;
-            padding: 38px 0 0 44px;
+            gap: 40px;
         }
 
         body.shake {
             animation: stupidBgShift 8s ease infinite, stupidBounce 4s ease-in-out infinite, mlgShake 0.2s linear;
-=======
-            gap: 20px;
->>>>>>> e9875a9526d1b31dc2ff51ff03b740afeada8aa2
         }
 
         body::before {
@@ -457,6 +452,51 @@
         .map-control-btn:active {
             transform: translateY(0);
         }
+
+        .location-panel {
+            position: fixed;
+            left: 12px;
+            bottom: 12px;
+            width: min(92vw, 420px);
+            max-height: 45vh;
+            overflow: auto;
+            z-index: 11;
+            background: rgba(0, 0, 0, 0.78);
+            color: #fff;
+            border: 3px solid #fff;
+            padding: 12px;
+        }
+
+        .location-panel h2 {
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+
+        .location-actions {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+        }
+
+        .location-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            font-size: 13px;
+        }
+
+        .location-item {
+            border: 1px solid rgba(255, 255, 255, 0.45);
+            padding: 6px;
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .location-status {
+            font-size: 12px;
+            color: #a7ff83;
+        }
     </style>
 </head>
 <body>
@@ -470,49 +510,33 @@
     <div class="flash" id="flash"></div>
     <div class="mlg-overlay" id="mlgOverlay"></div>
     <div class="footsteps-container" id="footsteps"></div>
-<<<<<<< HEAD
-
     <aside class="reels-panel" aria-label="Reels sidebar">
         <div class="reels-title">Reels</div>
         <div class="reels-feed" id="reelsFeed"></div>
     </aside>
-
     <div class="counter-label">Step Counter</div>
     <div class="count-display" id="count">0</div>
     <div class="step-unit">steps</div>
     <div class="step-cluster" id="stepCluster">
         <button class="plus-btn" id="plusBtn" onclick="moveAndIncrement()" aria-label="Add one step">+</button>
         <div class="step-outside">STEP</div>
-=======
-    
-    <div class="tab-container">
-        <button class="tab-btn active" onclick="switchTab('counter')">Step Counter</button>
-        <button class="tab-btn" onclick="switchTab('location')">Location History</button>
     </div>
 
-    <div id="counter-tab" class="tab-content active">
-        <div class="counter-label">Step Counter</div>
-        <div class="count-display" id="count">0</div>
-        <div class="step-unit">steps</div>
-        <button class="plus-btn" id="plusBtn" onclick="moveAndIncrement()" aria-label="Add one step">STEP</button>
-    </div>
-
-    <div id="location-tab" class="tab-content">
-        <div class="counter-label">Location History</div>
-        <canvas id="map"></canvas>
-        <div class="map-controls">
-            <button class="map-control-btn" onclick="zoomIn()">🔍+ Zoom In</button>
-            <button class="map-control-btn" onclick="zoomOut()">🔍- Zoom Out</button>
-            <button class="map-control-btn" onclick="centerOnLocation()">📍 Center</button>
+    <section class="location-panel" aria-label="Location history panel">
+        <h2>Location History</h2>
+        <div class="location-actions">
+            <button class="map-control-btn" type="button" onclick="recordLocation()">Record Location</button>
+            <button class="map-control-btn" type="button" onclick="clearLocationHistory()">Clear History</button>
         </div>
->>>>>>> e9875a9526d1b31dc2ff51ff03b740afeada8aa2
-    </div>
+        <p class="location-status" id="locationStatus">No location recorded yet.</p>
+        <ul class="location-list" id="locationList"></ul>
+    </section>
 
     <script>
         let count = 0;
-<<<<<<< HEAD
         let audioCtx;
         let masterGain;
+        const locationHistory = [];
         const gifUrls = [
             'https://media.giphy.com/media/3o7aD2saalBwwftBIY/giphy.gif',
             'https://media.giphy.com/media/l0HlBO7eyXzSZkJri/giphy.gif',
@@ -534,168 +558,6 @@
             'TACTICAL STEP',
             'DORITO MODE'
         ];
-=======
-        let canvas = null;
-        let ctx = null;
-        let userLocation = null;
-        let mapZoom = 1;
-        let panX = 0;
-        let panY = 0;
-
-        function switchTab(tabName) {
-            // Hide all tabs
-            document.getElementById('counter-tab').classList.remove('active');
-            document.getElementById('location-tab').classList.remove('active');
-            
-            // Remove active class from all buttons
-            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-            
-            // Show selected tab
-            if (tabName === 'counter') {
-                document.getElementById('counter-tab').classList.add('active');
-                document.querySelectorAll('.tab-btn')[0].classList.add('active');
-            } else if (tabName === 'location') {
-                document.getElementById('location-tab').classList.add('active');
-                document.querySelectorAll('.tab-btn')[1].classList.add('active');
-                if (!canvas) {
-                    initMap();
-                } else {
-                    drawMap();
-                }
-            }
-        }
-
-        function initMap() {
-            canvas = document.getElementById('map');
-            ctx = canvas.getContext('2d');
-            canvas.width = 600;
-            canvas.height = 500;
-
-            // Get user's location
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(
-                    (position) => {
-                        userLocation = {
-                            lat: position.coords.latitude,
-                            lng: position.coords.longitude
-                        };
-                        drawMap();
-                        
-                        // Allow mouse panning
-                        canvas.addEventListener('mousedown', startPan);
-                        canvas.addEventListener('mousemove', doPan);
-                        canvas.addEventListener('mouseup', endPan);
-                    },
-                    (error) => {
-                        console.log('Location access denied, using default');
-                        userLocation = { lat: 40.7128, lng: -74.0060 };
-                        drawMap();
-                    }
-                );
-            }
-        }
-
-        let isPanning = false;
-        let lastX = 0;
-        let lastY = 0;
-
-        function startPan(e) {
-            isPanning = true;
-            lastX = e.clientX;
-            lastY = e.clientY;
-        }
-
-        function doPan(e) {
-            if (!isPanning) return;
-            const deltaX = e.clientX - lastX;
-            const deltaY = e.clientY - lastY;
-            panX += deltaX;
-            panY += deltaY;
-            lastX = e.clientX;
-            lastY = e.clientY;
-            drawMap();
-        }
-
-        function endPan() {
-            isPanning = false;
-        }
-
-        function drawMap() {
-            if (!ctx || !userLocation) return;
-
-            // Clear canvas
-            ctx.fillStyle = '#e8f4f8';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-            // Draw grid
-            ctx.strokeStyle = '#d0e8f2';
-            ctx.lineWidth = 1;
-            const gridSize = 50 * mapZoom;
-            for (let x = panX % gridSize; x < canvas.width; x += gridSize) {
-                ctx.beginPath();
-                ctx.moveTo(x, 0);
-                ctx.lineTo(x, canvas.height);
-                ctx.stroke();
-            }
-            for (let y = panY % gridSize; y < canvas.height; y += gridSize) {
-                ctx.beginPath();
-                ctx.moveTo(0, y);
-                ctx.lineTo(canvas.width, y);
-                ctx.stroke();
-            }
-
-            // Draw some random buildings/streets as "surroundings"
-            ctx.fillStyle = '#b0d4e3';
-            for (let i = 0; i < 15; i++) {
-                const x = (Math.sin(i * 123.456) * 300 + canvas.width / 2 + panX) % canvas.width;
-                const y = (Math.cos(i * 789.012) * 250 + canvas.height / 2 + panY) % canvas.height;
-                const w = (Math.sin(i * 345.678) * 30 + 40) * mapZoom;
-                const h = (Math.cos(i * 567.890) * 30 + 40) * mapZoom;
-                ctx.fillRect(x, y, w, h);
-                ctx.strokeStyle = '#667eea';
-                ctx.lineWidth = 2;
-                ctx.strokeRect(x, y, w, h);
-            }
-
-            // Draw user location marker
-            const centerX = canvas.width / 2 + panX;
-            const centerY = canvas.height / 2 + panY;
-            
-            ctx.fillStyle = '#ff6b6b';
-            ctx.beginPath();
-            ctx.arc(centerX, centerY, 12 * mapZoom, 0, Math.PI * 2);
-            ctx.fill();
-            
-            ctx.fillStyle = 'white';
-            ctx.beginPath();
-            ctx.arc(centerX, centerY, 6 * mapZoom, 0, Math.PI * 2);
-            ctx.fill();
-
-            // Draw coordinates
-            ctx.fillStyle = '#333';
-            ctx.font = 'bold 14px Arial';
-            ctx.fillText(`Lat: ${userLocation.lat.toFixed(4)}`, 10, 25);
-            ctx.fillText(`Lng: ${userLocation.lng.toFixed(4)}`, 10, 45);
-            ctx.fillText(`Zoom: ${mapZoom.toFixed(1)}x`, 10, 65);
-        }
-
-        function zoomIn() {
-            mapZoom = Math.min(mapZoom + 0.2, 3);
-            if (canvas) drawMap();
-        }
-
-        function zoomOut() {
-            mapZoom = Math.max(mapZoom - 0.2, 0.5);
-            if (canvas) drawMap();
-        }
-
-        function centerOnLocation() {
-            panX = 0;
-            panY = 0;
-            mapZoom = 1;
-            if (canvas) drawMap();
-        }
->>>>>>> e9875a9526d1b31dc2ff51ff03b740afeada8aa2
 
         function moveAndIncrement() {
             count++;
@@ -894,6 +756,92 @@
 
         function updateDisplay() {
             document.getElementById('count').textContent = count;
+        }
+
+        function recordLocation() {
+            const status = document.getElementById('locationStatus');
+
+            if (!navigator.geolocation) {
+                status.textContent = 'Geolocation not supported in this browser.';
+                return;
+            }
+
+            status.textContent = 'Getting location...';
+
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    const { latitude, longitude } = position.coords;
+                    const timestamp = new Date().toLocaleString();
+
+                    locationHistory.unshift({ latitude, longitude, timestamp });
+                    if (locationHistory.length > 20) {
+                        locationHistory.pop();
+                    }
+
+                    renderLocationHistory();
+                    status.textContent = `Saved location at ${timestamp}`;
+                },
+                (error) => {
+                    status.textContent = `Location error: ${error.message}`;
+                },
+                {
+                    enableHighAccuracy: true,
+                    timeout: 10000,
+                    maximumAge: 0,
+                }
+            );
+        }
+
+        function clearLocationHistory() {
+            locationHistory.length = 0;
+            renderLocationHistory();
+            document.getElementById('locationStatus').textContent = 'Location history cleared.';
+        }
+
+        function calculateDistance(lat1, lon1, lat2, lon2) {
+            const R = 6371; // Earth's radius in kilometers
+            const dLat = (lat2 - lat1) * Math.PI / 180;
+            const dLon = (lon2 - lon1) * Math.PI / 180;
+            const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                      Math.sin(dLon / 2) * Math.sin(dLon / 2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+            const distance = R * c; // Distance in km
+            return distance;
+        }
+
+        function renderLocationHistory() {
+            const list = document.getElementById('locationList');
+            list.innerHTML = '';
+            let totalDistance = 0;
+
+            locationHistory.forEach((entry, index) => {
+                const item = document.createElement('li');
+                item.className = 'location-item';
+                
+                let distanceText = '';
+                if (index > 0) {
+                    const prevEntry = locationHistory[index - 1];
+                    const distance = calculateDistance(
+                        prevEntry.latitude, prevEntry.longitude,
+                        entry.latitude, entry.longitude
+                    );
+                    totalDistance += distance;
+                    distanceText = ` | ${distance.toFixed(3)}km from prev`;
+                }
+                
+                item.textContent = `#${index + 1} ${entry.latitude.toFixed(6)}, ${entry.longitude.toFixed(6)}${distanceText} (${entry.timestamp})`;
+                list.appendChild(item);
+            });
+
+            if (locationHistory.length > 1) {
+                const totalItem = document.createElement('li');
+                totalItem.className = 'location-item';
+                totalItem.style.fontWeight = 'bold';
+                totalItem.style.backgroundColor = 'rgba(255, 255, 255, 0.15)';
+                totalItem.textContent = `Total distance traveled: ${totalDistance.toFixed(3)}km`;
+                list.appendChild(totalItem);
+            }
         }
 
         // Initialize button at random position
